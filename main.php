@@ -1,13 +1,14 @@
 <?php
 	
+	require_once 'inc/config.php.private'; //thar be settings
 	require_once 'inc/MCAPI.class.php';
-	require_once 'inc/config.inc.php'; //contains apikey
-   require_once 'Zend/Loader.php';
-    Zend_Loader::loadClass('Zend_Gdata');
-    Zend_Loader::loadClass('Zend_Gdata_ClientLogin');
-    Zend_Loader::loadClass('Zend_Http_Client');
-    Zend_Loader::loadClass('Zend_Gdata_Query');
-    Zend_Loader::loadClass('Zend_Gdata_Feed');
+	require_once 'Zend/Loader.php';
+	
+	Zend_Loader::loadClass('Zend_Gdata');
+	Zend_Loader::loadClass('Zend_Gdata_ClientLogin');
+	Zend_Loader::loadClass('Zend_Http_Client');
+	Zend_Loader::loadClass('Zend_Gdata_Query');
+	Zend_Loader::loadClass('Zend_Gdata_Feed');
     
 
 	$MC['api'] = new MCAPI($MC['apikey']);
@@ -146,7 +147,7 @@ function get_subscribed_members($service) {
       // perform query and get result feed
       $query = new Zend_Gdata_Query(
         'http://www.google.com/m8/feeds/contacts/default/full');
-      $query->maxResults = 10; //FIXME
+      $query->maxResults = 1000; //FIXME
       $query->setParam('orderby', 'lastmodified');
 			$query->setParam('sortorder', 'descending');
 			$query->setParam('group', 'http://www.google.com/m8/feeds/groups/makauwahi@gmail.com/base/'.$GC['subscribed_group']);
@@ -213,8 +214,8 @@ function sync_all_members() {
 		var_dump($GC['members']);
 	}
 
-	//each person that is not in mailchimp yet
-	$new_subscribers = array_diff_key($GC['members'], $MC['members']);
+	//each person that is not in mailchimp yet, case insensitive
+	$new_subscribers = array_diff_ukey($GC['members'], $MC['members'], 'strcasecmp');
 	if($v>1) {
 		var_dump($new_subscribers);
 	}
